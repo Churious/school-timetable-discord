@@ -79,7 +79,7 @@ def get_timetable(office: str, school_code: str, date_text: str, grade: str, cla
 
 def send_discord(webhook: str, user_id: str, school: str, grade: str, class_num: str, today: datetime, timetable: dict[int, tuple[str, str]]) -> None:
     date_label = f"{today.month}월 {today.day}일 {WEEKDAYS[today.weekday()]} 시간표"
-    lines = [f"`{period:>2}교시` │ {time_text or '시간 미정':<11} │ **{subject}**" for period, (subject, time_text) in timetable.items()]
+    lines = [f"`{period:>2}교시` │ {time_text} │ **{subject}**" if time_text else f"`{period:>2}교시` │ **{subject}**" for period, (subject, time_text) in timetable.items()]
     description = "\n".join(lines) if lines else "오늘은 등록된 시간표가 없습니다."
     mention = f"<@{user_id}>\n" if user_id else ""
     payload = {"content": mention, "allowed_mentions": {"users": [user_id]} if user_id else {"parse": []}, "embeds": [{"title": f"📚 {date_label}", "description": description, "color": 3447003, "fields": [{"name": "학교", "value": school, "inline": False}, {"name": "학년/반", "value": f"{grade}학년 {class_num}반", "inline": True}], "footer": {"text": "NEIS Open API · KST"}}]}
