@@ -1,6 +1,6 @@
 # 학교 시간표 Discord 자동 전송
 
-대한민국 NEIS Open API에서 오늘의 고등학교 시간표를 조회해 Discord Embed 웹훅으로 보냅니다. 한국 시간(Asia/Seoul)을 사용하며 토·일요일에는 전송하지 않습니다.
+대한민국 NEIS Open API에서 오늘의 고등학교 시간표를 조회해 Discord Embed 웹훅으로 보냅니다. 한국 시간(Asia/Seoul)을 사용하며 토·일요일에는 전송하지 않습니다. GitHub Actions는 평일 오전 8시 10분과 오후 1시 10분(KST)에 실행됩니다.
 
 ## 1. GitHub에 프로젝트 올리기
 
@@ -27,13 +27,15 @@ NEIS 공식 키를 발급받았다면 같은 곳에 `NEIS_API_KEY`도 추가하�
 
 ## 4. 학교명/학년/반 설정
 
-**Settings → Secrets and variables → Actions → Variables → New repository variable**에서 다음 이름으로 등록합니다.
+필수 설정은 4개입니다. **Settings → Secrets and variables → Actions → Variables → New repository variable**에서 다음 3개를 등록합니다.
 
 ```text
 SCHOOL_NAME=학교의 공식 명칭
 GRADE=2
 CLASS_NUM=3
 ```
+
+나머지 1개인 `DISCORD_WEBHOOK_URL`은 반드시 Secrets에 등록합니다. `NEIS_API_KEY`는 선택 항목이지만 안정적인 사용을 위해 권장합니다.
 
 학교명은 NEIS에 등록된 이름과 가깝게 입력하세요. 코드는 학교명을 검색해 교육청 코드와 학교 코드를 자동으로 가져옵니다.
 
