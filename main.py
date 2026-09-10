@@ -60,25 +60,29 @@ def clean_subject(value: str) -> str:
     return re.sub(r"\s+", " ", value).strip() or "(과목 없음)"
 
 
-def get_timetable(office: str, school_code: str, date_text: str, grade: str, class_num: str) -> dict[int, str]:
+def get_timetable(office: str, school_code: str, date_text: str, grade: str, class_num: str) -> dict[int, tuple[str, str]]:
     rows = neis_get("hisTimetable", {"ATPT_OFCDC_SC_CODE": office, "SD_SCHUL_CODE": school_code, "ALL_TI_YMD": date_text, "GRADE": grade, "CLASS_NM": class_num})
-    result: dict[int, str] = {}
+    result: dict[int, tuple[str, str]] = {}
     for row in rows:
         try:
             period = int(str(row.get("PERIO", "")).strip())
         except ValueError:
             continue
         subject = clean_subject(row.get("ITRT_CNTNT", ""))
-        if period not in result or result[period] == "(과목 없음)":
-            result[period] = subject
+        start = next((str(row[k]).strip() for k in row if "START" in k.upper() or "BEGIN" in k.upper()), "")
+        end = next((str(row[k]).strip() for k in row if "END" in k.upper() or "FINISH" in k.upper()), "")
+        time_text = f"{start}~{end}" if start and end else start or end
+        if period not in result or result[period][0] == "(과목 없음)":
+            result[period] = (subject, time_text)
     return dict(sorted(result.items()))
 
 
-def send_discord(webhook: str, school: str, grade: str, class_num: str, today: datetime, timetable: dict[int, str]) -> None:
+def send_discord(webhook: str, user_id: str, school: str, grade: str, class_num: str, today: datetime, timetable: dict[int, tuple[str, str]]) -> None:
     date_label = f"{today.month}월 {today.day}일 {WEEKDAYS[today.weekday()]} 시간표"
-    lines = [f"{period}교시 | {subject}" for period, subject in timetable.items()]
+    lines = [f"`{period:>2}교시` │ {time_text or '시간 미정':<11} │ **{subject}**" for period, (subject, time_text) in timetable.items()]
     description = "\n".join(lines) if lines else "오늘은 등록된 시간표가 없습니다."
-    payload = {"embeds": [{"title": f"📚 {date_label}", "description": description, "color": 3447003, "fields": [{"name": "학교", "value": school, "inline": False}, {"name": "학년/반", "value": f"{grade}학년 {class_num}반", "inline": True}], "footer": {"text": "NEIS Open API · KST"}}]}
+    mention = f"<@{user_id}>\n" if user_id else ""
+    payload = {"content": mention, "allowed_mentions": {"users": [user_id]} if user_id else {"parse": []}, "embeds": [{"title": f"📚 {date_label}", "description": description, "color": 3447003, "fields": [{"name": "학교", "value": school, "inline": False}, {"name": "학년/반", "value": f"{grade}학년 {class_num}반", "inline": True}], "footer": {"text": "NEIS Open API · KST"}}]}
     try:
         response = requests.post(webhook, json=payload, timeout=20)
         response.raise_for_status()
@@ -96,9 +100,10 @@ def main() -> int:
         grade = env_required("GRADE")
         class_num = env_required("CLASS_NUM")
         webhook = env_required("DISCORD_WEBHOOK_URL")
+        user_id = os.getenv("DISCORD_USER_ID", "").strip()
         office, school_code, official_name = find_school(school_name)
         timetable = get_timetable(office, school_code, today.strftime("%Y%m%d"), grade, class_num)
-        send_discord(webhook, official_name, grade, class_num, today, timetable)
+        send_discord(webhook, user_id, official_name, grade, class_num, today, timetable)
         print(f"전송 완료: {official_name} / {grade}학년 {class_num}반 / {len(timetable)}개 교시")
         return 0
     except (ValueError, NeisError, RuntimeError) as exc:

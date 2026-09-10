@@ -16,6 +16,7 @@ jobs:
       GRADE: ${{ secrets.GRADE || vars.GRADE }}
       CLASS_NUM: ${{ secrets.CLASS_NUM || vars.CLASS_NUM }}
       DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      DISCORD_USER_ID: ${{ secrets.DISCORD_USER_ID }}
       NEIS_API_KEY: ${{ secrets.NEIS_API_KEY }}
     steps:
       - uses: actions/checkout@v4

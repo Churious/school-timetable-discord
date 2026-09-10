@@ -37,6 +37,8 @@ CLASS_NUM=3
 
 나머지 1개인 `DISCORD_WEBHOOK_URL`은 반드시 Secrets에 등록합니다. `NEIS_API_KEY`는 선택 항목이지만 안정적인 사용을 위해 권장합니다.
 
+알림을 받을 Discord 사용자 ID를 `DISCORD_USER_ID`라는 Repository Secret으로 추가하면 메시지 앞에 해당 사용자를 멘션합니다. 사용자 ID는 Discord 개발자 모드에서 사용자 우클릭 → **사용자 ID 복사**로 얻습니다. 입력할 때 `<@...>`가 아니라 숫자 ID만 넣으세요. 생략하면 멘션 없이 전송됩니다.
+
 학교명은 NEIS에 등록된 이름과 가깝게 입력하세요. 코드는 학교명을 검색해 교육청 코드와 학교 코드를 자동으로 가져옵니다.
 
 ## 5. GitHub Actions 활성화
