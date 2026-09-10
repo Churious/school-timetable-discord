@@ -27,7 +27,7 @@ NEIS 공식 키를 발급받았다면 같은 곳에 `NEIS_API_KEY`도 추가하�
 
 ## 4. 학교명/학년/반 설정
 
-필수 설정은 4개입니다. **Settings → Secrets and variables → Actions → Variables → New repository variable**에서 다음 3개를 등록합니다.
+필수 설정은 4개입니다. `SCHOOL_NAME`, `GRADE`, `CLASS_NUM`은 Repository Variables 또는 Repository Secrets 중 한 곳에 등록할 수 있습니다. Secrets로 등록했다면 **Settings → Secrets and variables → Actions → New repository secret**, Variables로 등록했다면 **Variables → New repository variable**을 사용하세요.
 
 ```text
 SCHOOL_NAME=학교의 공식 명칭

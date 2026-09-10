@@ -12,9 +12,9 @@ jobs:
   send-timetable:
     runs-on: ubuntu-latest
     env:
-      SCHOOL_NAME: ${{ vars.SCHOOL_NAME }}
-      GRADE: ${{ vars.GRADE }}
-      CLASS_NUM: ${{ vars.CLASS_NUM }}
+      SCHOOL_NAME: ${{ secrets.SCHOOL_NAME || vars.SCHOOL_NAME }}
+      GRADE: ${{ secrets.GRADE || vars.GRADE }}
+      CLASS_NUM: ${{ secrets.CLASS_NUM || vars.CLASS_NUM }}
       DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
       NEIS_API_KEY: ${{ secrets.NEIS_API_KEY }}
     steps:
