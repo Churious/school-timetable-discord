@@ -1,0 +1,23 @@
+name: Send school timetable
+
+on:
+  schedule:
+    - cron: "30 22 * * 1-5"
+  workflow_dispatch:
+
+jobs:
+  send-timetable:
+    runs-on: ubuntu-latest
+    env:
+      SCHOOL_NAME: ${{ vars.SCHOOL_NAME }}
+      GRADE: ${{ vars.GRADE }}
+      CLASS_NUM: ${{ vars.CLASS_NUM }}
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      NEIS_API_KEY: ${{ secrets.NEIS_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+      - run: python main.py
