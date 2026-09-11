@@ -14,6 +14,16 @@ load_dotenv()
 BASE_URL = "https://open.neis.go.kr/hub"
 KST = ZoneInfo("Asia/Seoul")
 WEEKDAYS = ["월요일", "화요일", "수요일", "목요일", "금요일", "토요일", "일요일"]
+PERIOD_START_TIMES = {
+    1: "08:50",
+    2: "09:50",
+    3: "10:50",
+    4: "11:50",
+    5: "13:30",
+    6: "14:30",
+    7: "15:30",
+    8: "16:30",
+}
 
 
 class NeisError(RuntimeError):
@@ -71,7 +81,8 @@ def get_timetable(office: str, school_code: str, date_text: str, grade: str, cla
         subject = clean_subject(row.get("ITRT_CNTNT", ""))
         start = next((str(row[k]).strip() for k in row if "START" in k.upper() or "BEGIN" in k.upper()), "")
         end = next((str(row[k]).strip() for k in row if "END" in k.upper() or "FINISH" in k.upper()), "")
-        time_text = f"{start}~{end}" if start and end else start or end
+        # NEIS에 시간 정보가 없으면 학교 일정에 맞춘 하드코딩 시작시간을 사용합니다.
+        time_text = f"{start}~{end}" if start and end else start or end or PERIOD_START_TIMES.get(period, "")
         if period not in result or result[period][0] == "(과목 없음)":
             result[period] = (subject, time_text)
     return dict(sorted(result.items()))
